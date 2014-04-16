@@ -1,14 +1,14 @@
 {
   "name": "LaGrange-Frontend-Framework",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "js/app.js",
   "ignore": [
     ".jshintrc",
     "**/*.txt"
   ],
   "dependencies": {
-    "jquery": "=1.9.0",
-    "imagesloaded": "latest"
+    "jquery": ">=1.9 <2.0",
+    "imagesloaded": "~3.1.4"
   },
   "private": true
 }
