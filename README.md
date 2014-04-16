@@ -18,5 +18,5 @@ Files related to the index.html file only.
 ##### /src
 Actual base folder of the framework. Consider this as the root of your project, therefore the following subfolder structure should be the same in your projects.
 
-* _/js/grange :
+* _/js/lagrange :
 	JavaScript Classes and Dependencies going in their relative folders (structure to come).
