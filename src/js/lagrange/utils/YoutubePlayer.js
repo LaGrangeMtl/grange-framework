@@ -32,7 +32,14 @@
 				window.onYouTubePlayerAPIReady = function() {
 					youtubeLoaded.resolve();
 				};/**/
-				require(['http://www.youtube.com/iframe_api'], function(){});
+				if (typeof require === 'function'){
+					require(['http://www.youtube.com/iframe_api'], function(){});
+				} else {
+					var tag = document.createElement('script');
+					tag.src = "https://www.youtube.com/iframe_api";
+					var firstScriptTag = document.getElementsByTagName('script')[0];
+					firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+				}
 			}
 			return youtubeLoaded.promise();
 		};
