@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 					include: [],
 					insertRequire: [],
 					out: "example/built/app.js",
-					baseUrl: 'js/',
+					baseUrl: 'example/js/',
 					mainConfigFile: 'example/js/app.js',
 					done: function(done, output) {
 						var duplicates = require('rjs-build-analysis').duplicates(output);
