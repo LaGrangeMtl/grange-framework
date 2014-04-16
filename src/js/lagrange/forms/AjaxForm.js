@@ -1,5 +1,5 @@
 (function (root, factory) {
-    var nsParts = 'grange/forms/AjaxForm'.split('/');
+    var nsParts = 'lagrange/forms/AjaxForm'.split('/');
     var name = nsParts.pop();
     var ns = nsParts.reduce(function(prev, part){
         return prev[part] = (prev[part] || {});
@@ -7,7 +7,7 @@
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define('grange/forms/AjaxForm', ['jquery', 'grange/forms/AjaxPoster'], factory);
+        define('lagrange/forms/AjaxForm', ['jquery', 'lagrange/forms/AjaxPoster'], factory);
     } else {
         // Browser globals
         ns[name] = factory(root.jQuery, ns.AjaxPoster);
