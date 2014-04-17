@@ -8,7 +8,12 @@
   ],
   "dependencies": {
     "jquery": ">=1.9 <2.0",
-    "imagesloaded": "~3.1.4"
+    "imagesloaded": "~3.1.4",
+    "history.js": "~1.8.0",
+    "gsap": "latest",
+    "es5-shim": "latest",
+    "modernizr":"latest",
+    "underscore":"latest"
   },
   "private": true
 }

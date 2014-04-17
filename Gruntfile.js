@@ -18,10 +18,6 @@ module.exports = function(grunt) {
 				banner: '<%= banner %>',
 				stripBanners: true
 			},
-			imagesloaded: {
-				src: ['bower_components/imagesloaded/imagesloaded.js'],
-				dest: 'js/vendor/imagesloaded.js'
-			},
 	    },
 
 		requirejs: {
@@ -61,6 +57,26 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		bowercopy: {
+			options: {
+				srcPrefix: 'bower_components',
+			},
+			vendor: {
+				options: {
+					destPrefix: 'example/js/vendor',
+				},
+				 files: {
+					'jquery.js' : 'jquery/dist/jquery.min.js',
+					'es5-shim.min.js' : 'es5-shim/es5-shim.min.js',
+					'es5-sham.min.js' : 'es5-shim/es5-sham.min.js',
+					'modernizr.js' : 'modernizr/modernizr.js',
+					'underscore.js' : 'underscore/underscore.js',
+					'greensock' : 'gsap/src/minified',
+					'native.history.js' : 'history.js/scripts/bundled/html4+html5/native.history.js',
+				}
+			}
+		},
+
 		watch: {
 			js: {
 				files: 'example/js/**/*.js',
@@ -89,8 +105,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-bowercopy');
 
 	// Default task.
 	grunt.registerTask('default', ['requirejs:build']);
+	grunt.registerTask('prebuild', ['requirejs:prebuild', 'bowercopy']);
 
 };

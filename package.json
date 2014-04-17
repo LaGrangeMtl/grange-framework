@@ -13,7 +13,8 @@
 		"grunt": "~0.4.4",
 		"rjs-build-analysis": "0.0.3",
 		"grunt-contrib-less": "~0.7.0",
-	    "grunt-contrib-concat": "latest"
+	    "grunt-contrib-concat": "latest",
+	    "grunt-bowercopy":"latest"
 	},
 	"keywords": []
 }
