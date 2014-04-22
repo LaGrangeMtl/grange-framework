@@ -1,31 +1,29 @@
+ <?php require('includes/config.php'); ?>
 <!DOCTYPE html>
 <html class="no-js">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Framework La Grange | D</title>
+        <title>Framework La Grange | <?php echo $currentPage['title'] ?></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/master.css">
-        <link rel="canonical" href="index.d.html">
+        <link rel="canonical" href="<?php echo $link ?>">
         <script data-main="js/app.js" src="js/require.js"></script>
 
     </head>
     <body>
 
         <header>
-            <nav>
-                <a href="index.html">Page A</a>
-                <a href="index.b.html">Page B</a>
-                <a href="index.c.html">Page C</a>
-                <a href="index.d.html" class="active">Page D</a>
-            </nav>
+            <?php require('includes/menu.0.php'); ?>
+            <?php require('includes/menu.1.php'); ?>
+            <?php require('includes/menu.2.php'); ?>
         </header>
-
+        
         <section class="loadedContent">
-            <h1>I am page D</h1>
+            <h1><?php echo $currentPage['title'] ?></h1>
             <div class="content">
-                <img src="http://3.bp.blogspot.com/-MBqqFX_-6EQ/Unhsr0Ojm5I/AAAAAAAAAIY/J5sg1SY31AM/s1600/So+much+doge+_2ec24532e24abb4835551a2f6d29116c.jpg">
+                <img src="<?php echo $currentPage['image'] ?>">
             </div>
         </section>
       
