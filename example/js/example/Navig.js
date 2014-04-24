@@ -25,7 +25,7 @@ define(
 		};
 
 		var setMenuActive = function(currentPage, isOnInit) {
-			Menus.activateQueue();
+			Menus.activate(bindClicks);
 		};
 
 		var loadPage = function(url){
@@ -101,15 +101,19 @@ define(
 			return loadPage(window.location.protocol + '//' + window.location.host + parsedHash);
 		};
 
-		var bindClicks = function(elements){
-			if (!isAvailable()) return;
-			elements.off(".navig").on('click.navig', function(e){
+		var bindClicks = (function(){
+			var onNavig = function(e){
 				e.preventDefault();
 				var _self = $(this);
 				loadPage(_self.attr('href'));
 				return false;
-			});
-		};
+			};
+
+			return function(elements){
+				if (!isAvailable()) return;
+				elements.off(".navig").on('click.navig', onNavig);
+			};
+		}());
 
 		return {
 			init: function(){
@@ -141,7 +145,7 @@ define(
 					if (!isAvailable()) return;
 				});
 
-				bindClicks(Menus.getElements());
+				Menus.activate(bindClicks);
 			},
 
 			activateContext : function(context) {

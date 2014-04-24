@@ -24,23 +24,16 @@
 
 	var ACTIVATE = 'activate';
 	var REMOVE = 'remove';
-	var queue = [];
 
-	var getNodeFromSelector = function(input, selector){
-		var node = selector ? $(selector, input) : $('<div>').append(input);
-		//si le node n'est pas trouvé avec le selector, il est possible que le node soit au premier niveau du jquery donné
-		if(node.length == 0 && selector){
-			node = input.filter(selector);
-		}
-		return node;
-	};
+	var queue = [];
 
 	var activeMenus = (function(){
 		var menus = [];
 
 		return {
-			setMenu : function(menu) {
+			setMenu : function(menu, bindClicks) {
 				menus[menu.level] = menu;
+				bindClicks(menu.element.find('a'));
 			},
 
 			getMenu : function(level){
@@ -57,26 +50,25 @@
 					vals.push(menu.level);
 					return vals;
 				}, []);
-			},
-
-			getLinks : function(){
-				var elements;
-				$.each(menus, function(k, item){
-					var links = item.element.find('a');
-					elements = (elements && elements.add(links) ) || links;
-					
-				});				
-				return elements;
 			}
-
+			
 		};
 
 	}());
 
-	var setInitialState = function(){
+	var getNodeFromSelector = function(input, selector){
+		var node = selector ? $(selector, input) : $('<div>').append(input);
+		//si le node n'est pas trouvé avec le selector, il est possible que le node soit au premier niveau du jquery donné
+		if(node.length == 0 && selector){
+			node = input.filter(selector);
+		}
+		return node;
+	};
+
+	var setInitialState = function(bindClicks){
 		if(!activeMenus.getMenu()) {
 			queue.forEach(function(menu, i) {
-				activeMenus.setMenu(menu);
+				activeMenus.setMenu(menu, bindClicks);
 				menu.instance.jumpToInState();
 			});
 			queue.length = 0;
@@ -121,8 +113,6 @@
 				}
 			}.bind(this));
 
-
-
 			//now make sure that each active menu level is to be activated/replaced by an item in the cue. Otherwise, we will detach the active menu.	
 			activeMenus.getDefinedLevels().forEach(function(level){
 				var isDefinedInQueue = queue.reduce(function(isFound, menu){
@@ -136,22 +126,19 @@
 				}
 			});
 		
-
 			//make sure queue is in the right order
 			queue.sort(function(a, b){
 				return a.level - b.level;
 			});
-
-			setInitialState();
-
-			/*console.log(activeMenus);
-			console.log(queue);/**/
 		},
 
 		/**
 		This method, called by the app, activates each menu when changing from one page to the other. It is the most tricky part, as it has the responsability to remove irrelevent menus and attach the new ones in the dom, depending on the structure of the loaded page.
 		*/
-		activateQueue : function(){
+		activate : function(bindClicks){
+
+			setInitialState(bindClicks);
+
 			if(!queue.length) return;
 			//console.log(queue);
 			queue.forEach(function(item){
@@ -175,7 +162,7 @@
 					var onOut = activeMenu.instance.animateOut();
 					onOut.then(function(){
 						activeMenu.element.replaceWith(item.element);
-						activeMenus.setMenu(item);
+						activeMenus.setMenu(item, bindClicks);
 						item.instance.animateIn();
 					});
 				
@@ -184,14 +171,10 @@
 					var container = $(this.selectors.containers + item.level);
 					container.append(item.element);
 					item.instance.animateIn();
-					activeMenus.setMenu(item);
+					activeMenus.setMenu(item, bindClicks);
 				}
 			}.bind(this));
 			queue.length = 0;
-		},
-
-		getElements : function(){
-			return activeMenus.getLinks();vals
 		}
 
 	};
