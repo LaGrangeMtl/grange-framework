@@ -4,15 +4,14 @@ define(
 		'lagrange/utils/WindowUtils',
 		'lagrange/utils/MobileDetect',
 		'jquery',
-		'example/Menu',
+		'example/menus/Menus',
 		'example/content/PageFactory',
 		'example/content/Preloader',
 		'TweenMax',
 		'native.history'
 	],
-	function(ns, WU, MobileDetect, $, Menu, PageFactory, Preloader, TweenMax){
+	function(ns, WU, MobileDetect, $, Menus, PageFactory, Preloader, TweenMax){
 
-		var contentSelector = '.loadedContent';
 		var containerId = 'navigWrapper';
 		var container;
 		var canonical;
@@ -26,7 +25,7 @@ define(
 		};
 
 		var setMenuActive = function(currentPage, isOnInit) {
-			var activeMenuItem = Menu.activate(currentPage.getId(), isOnInit);
+			Menus.activateQueue();
 		};
 
 		var loadPage = function(url){
@@ -38,20 +37,23 @@ define(
 			//on est deja sur la page qu'on request. do nothing
 			if(nextId === currentPage.getId()) return;
 
-			loading = PageFactory.load(url, contentSelector);
+			loading = PageFactory.load(url);
 
 			$.when(loading).then(function(nextPage){
 				//console.log('go in');
 				transitTo(nextPage, false);
 			});
 
-		}
+		};
 
 		var transitTo = function(nextPage, isSubNavig){
 
 			//swap les pages : l'ancienne s'en va, la prochaine devient l'actuelle
 			var oldNode = currentPage.getContentNode();
 			var currentNode = nextPage.getContentNode();
+
+			//finds menus in loaded page
+			//var loadedMenus = nextPage.find(
 
 			
 			ns.app.deactivate(oldNode);
@@ -114,8 +116,8 @@ define(
 				var path = $('link[rel="canonical"]').attr('href');
 
 				var title = $('title').html();
-				//console.log(path, contentSelector, title)
-				currentPage = PageFactory.createOriginalPage(path, contentSelector, title);
+				//console.log(path, title)
+				currentPage = PageFactory.createOriginalPage(path, title);
 				canonical = currentPage.name;
 
 				if(isAvailable()){
@@ -139,7 +141,7 @@ define(
 					if (!isAvailable()) return;
 				});
 
-				bindClicks(Menu.getElements());
+				bindClicks(Menus.getElements());
 			},
 
 			activateContext : function(context) {
@@ -147,7 +149,6 @@ define(
 				if (!isAvailable()) return;
 				
 				bindClicks(context.find('a.inner'))/**/
-
 
 			},
 

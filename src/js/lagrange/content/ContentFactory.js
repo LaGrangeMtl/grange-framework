@@ -29,36 +29,31 @@
 
 	var cachedDeferred = {};
 	var putDeferredToCache = function(id, deferred) {
-		cachedDeferred[id] = deferred;
+		//cachedDeferred[id] = deferred;
 	};
+
 
 	var createLoadedContent = function(rawResponse, createParams, createContentCallback) {
 			
 		var title = rawResponse.filter('title').html();
 		var asyncExtender = Async.getExtender(rawResponse);
 		var noscriptResponse = asyncExtender.getFilteredResponse();
-		
-		var node = createParams.selector ? $(createParams.selector, noscriptResponse) : $('<div>').append(noscriptResponse);
-		//si le node n'est pas trouvé avec le selector, il est possible que le node soit au premier niveau du jquery donné
-		if(node.length == 0 && createParams.selector){
-			node = noscriptResponse.filter(createParams.selector);
-		}
-		
+				
 		createParams.title = title;
-		var content = createContentCallback(node, createParams, noscriptResponse);
+		var content = createContentCallback(noscriptResponse, createParams, noscriptResponse);
 		content = asyncExtender.extend(content);
 		
 		return content;
 	};
 
-	var getFromAjax = function(path, createParams, createContentCallback) {
+	var getFromAjax = function(path, createParams, selector, createContentCallback) {
 
 		var ajax = $.ajax({
 			url : path,
 			dataType :'html'
 		});
 		var success = function(data, textStatus, jqXHR) {
-			return createLoadedContent($(data), createParams, createContentCallback);
+			return createLoadedContent($(data), createParams, selector, createContentCallback);
 		};
 
 		var fail = function(jqXHR, textStatus, errorThrown) {
@@ -80,11 +75,29 @@
 		return false;
 	};
 
+	var getParams = function(path, title) {
+		return {
+			id : Async.getPagePart(path),
+			path : path,
+			title : title
+		};
+	};
+
 	return {
+
+		getNodeFromSelector : function(input, selector){
+			var node = selector ? $(selector, input) : $('<div>').append(input);
+			//si le node n'est pas trouvé avec le selector, il est possible que le node soit au premier niveau du jquery donné
+			if(node.length == 0 && selector){
+				node = input.filter(selector);
+			}
+			return node;
+		},
 		
 		//si la page est celle affichée au load (donc pas par ajax) il faut quand meme la créer parce qu'elle doit exister pour la navigation. i.e. elle doit avoir le meme comportement qu'une page qui serait loadée par ajax
-		createOriginalContent : function(createParams) {
-			var content = this.createContent($(createParams.selector), createParams);
+		createOriginalContent : function(path, title) {
+			var createParams = getParams(path, title);
+			var content = this.createContent(null, createParams);
 			
 			var asyncExtender = Async.getExtender();
 			content = asyncExtender.extend(content);
@@ -95,17 +108,8 @@
 			return content;
 		},
 
-		getParams : function(path, selector, title) {
-			return {
-				id : Async.getPagePart(path),
-				path : path,
-				selector : selector,
-				title : title
-			};
-		},
-
 		getPageId : function(path){
-			var createParams = this.getParams(path);
+			var createParams = getParams(path);
 			return createParams.id;
 		},
 	
@@ -123,10 +127,9 @@
 			throw new Error('load is abstract');	
 		},
 		
-		getLoadingDeferred : function(path, createParams){
+		getLoadingDeferred : function(path){
 			
-			createParams = createParams || {};
-			createParams = $.extend({id:Async.getPagePart(path)}, createParams);
+			createParams = getParams(path);
 			
 			return getFromCache(createParams.id) || getFromAjax(path, createParams, this.createContent.bind(this));
 

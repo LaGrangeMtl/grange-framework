@@ -15,17 +15,17 @@
     <body>
 
         <header>
-            <?php require('includes/menu.0.php'); ?>
-            <?php require('includes/menu.1.php'); ?>
-            <?php require('includes/menu.2.php'); ?>
+            <div id="menu_0"><?php require('includes/menu.0.php'); ?></div>
+            <div id="menu_1"><?php require('includes/menu.1.php'); ?></div>
+            <div id="menu_2"><?php require('includes/menu.2.php'); ?></div>
         </header>
         
-        <section class="loadedContent">
+        <article class="loadedContent">
             <h1><?php echo $currentPage['title'] ?></h1>
             <div class="content">
                 <img src="<?php echo $currentPage['image'] ?>">
             </div>
-        </section>
+        </article>
       
     </body>
 </html>
