@@ -27,11 +27,6 @@
 	}
 }(this, function ($, Async) {
 
-	var cachedDeferred = {};
-	var putDeferredToCache = function(id, deferred) {
-		//cachedDeferred[id] = deferred;
-	};
-
 
 	var createLoadedContent = function(rawResponse, createParams, createContentCallback) {
 			
@@ -57,22 +52,12 @@
 		};
 
 		var fail = function(jqXHR, textStatus, errorThrown) {
-			putDeferredToCache(createParams.id, null);
 			console.log(textStatus, jqXHR.responseText);
 		};
 
 		var filtered = ajax.pipe(success, fail);
 		
-		putDeferredToCache(createParams.id, filtered.promise());
 		return filtered.promise();
-	};
-	
-	var getFromCache = function(id) {
-		if(cachedDeferred[id]) {
-			//console.log(path+' from cache');
-			return cachedDeferred[id];
-		}
-		return false;
 	};
 
 	var getParams = function(path, title) {
@@ -104,7 +89,6 @@
 			
 			var deferred = $.Deferred();
 			deferred.resolve(content);
-			putDeferredToCache(createParams.id, deferred.promise());
 			return content;
 		},
 
@@ -131,7 +115,7 @@
 			
 			createParams = getParams(path);
 			
-			return getFromCache(createParams.id) || getFromAjax(path, createParams, this.createContent.bind(this));
+			return getFromAjax(path, createParams, this.createContent.bind(this));
 
 		}
 	};
