@@ -38,11 +38,11 @@
 		
 			
 	var out = function(){
-		$(this).data('tl').reverse();
+		$.data(this, 'tl').reverse();
 	};
 	
 	var hover = function(){
-		$(this).data('tl').play();
+		$.data(this, 'tl').play();
 	};
 	
 	var PluginPrototype = {
@@ -54,7 +54,6 @@
 			if(this.options.autoActivate === false) {
 				this.deactivate();
 			}
-			
 		},
 				
 		setTimeline : function() {

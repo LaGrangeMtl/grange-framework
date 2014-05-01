@@ -2,7 +2,7 @@
 (function(ns){
 	requirejs.config({
 		paths:{
-			'jquery' : 'vendor/jquery-2.1.0.min',
+			'jquery' : 'vendor/jquery',
 			'TweenMax' : 'vendor/greensock/TweenMax.min',
 			'native.history' : 'vendor/native.history',
 			'imagesloaded/imagesloaded' : 'vendor/imagesloaded',

@@ -9,15 +9,23 @@ define([
 		'jquery',
 		'lagrange/content/Async',
 		'lagrange/content/ContentFactory',
+		'example/menus/Menus',
 		'example/content/Page'
 	],
-	function($, Async, ContentFactory, Page) {
-		
+	function($, Async, ContentFactory, Menus, Page) {
+
+		var selector = 'article';
+
 		var PageFactory = Object.create(ContentFactory);
 		
 		$.extend(PageFactory, {
+			
+			createContent : function(context, createParams) {
 
-			createContent : function(node, createParams) {
+				Menus.setCurrent(context);
+
+				var node = this.getNodeFromSelector(context, selector);
+
 				var page = Page.factory();
 				page.setContentNode(node);
 				
@@ -27,19 +35,18 @@ define([
 				return page;
 			},
 			
-			load : function(path, selector){
-				var createParams = this.getParams(path, selector);
-				return this.getLoadingDeferred(path, createParams);
+			load : function(path){
+				return this.getLoadingDeferred(path);
 			},
 			
 			/** la page originale a aussi un buffered definition qui ne sera pas aexécuté si on ne passe pas par le factory */
-			createOriginalPage : function(canonical, selector, title) {
-				var createParams = this.getParams(canonical, selector, title);
-				
-				return this.createOriginalContent(createParams);
+			createOriginalPage : function(canonical, title) {				
+				return this.createOriginalContent(canonical, title);
 			}
 			
 		});
+
+
 		//console.dir(PageFactory);
 		return PageFactory;
 
