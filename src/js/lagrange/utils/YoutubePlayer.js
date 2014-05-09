@@ -29,6 +29,9 @@
 		return function() {
 			if(!youtubeLoaded) {
 				youtubeLoaded = $.Deferred();
+
+				if(window.YT) return youtubeLoaded.resolve().promise();
+				
 				window.onYouTubePlayerAPIReady = function() {
 					youtubeLoaded.resolve();
 				};/**/
