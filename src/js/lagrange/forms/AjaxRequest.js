@@ -1,5 +1,5 @@
 (function (root, factory) {
-    var nsParts = 'lagrange/forms/AjaxPoster'.split('/');
+    var nsParts = 'lagrange/forms/AjaxRequest'.split('/');
     var name = nsParts.pop();
     var ns = nsParts.reduce(function(prev, part){
         return prev[part] = (prev[part] || {});
@@ -7,35 +7,37 @@
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define('lagrange/forms/AjaxForm', ['jquery'], factory);
+        define('lagrange/forms/AjaxRequest', ['jquery'], factory);
     } else {
         // Browser globals
         ns[name] = factory(root.jQuery);
     }
 }(this, function ($) {
     //==============================================================================
-    //  AjaxPoster : Constructor function
+    //  AjaxRequest : Constructor function
     //
     //  @params : options : Object containing several settings necessary for the
-    //                      well behavior of AjaxPoster. These settings are :
+    //                      well behavior of AjaxRequest. These settings are :
     //                      {
-    //                          type: 'POST',
+    //                          type: 'GET',
     //                          url: '',
-    //                          dataType: 'JSON',
+    //                          dataType: 'JSON', // By default, is not set so that
+    //                                                it uses the intelligent guess
+    //                                                provided by jQuery
     //                          debugOnFailure: true,
     //                          onSuccess:this.onSuccess,
     //                          onFailure:this.onFailure,
-    //                          beforePosting:this.beforePosting,
-    //                          afterPosting:this.afterPosting      
+    //                          beforeRequest:this.beforeRequest,
+    //                          afterRequest:this.afterRequest      
     //                      }
     //==============================================================================
-    var AjaxPoster = function(options){
+    var AjaxRequest = function(options){
         this.isPosting = false;
 
         this.init(options);
     };
 
-    AjaxPoster.prototype = {
+    AjaxRequest.prototype = {
         //==========================================================================
         //  init : Itinialisation function. Set options using the user defined
         //          options and the default ones.
@@ -47,22 +49,21 @@
 
             // Default values
             var defaultOptions = {
-                type: 'POST',
+                type: 'GET',
                 url: '',
-                dataType: "JSON",
                 debugOnFailure: true,
                 onSuccess:this.onSuccess,
                 onFailure:this.onFailure,
-                beforePosting:this.beforePosting,
-                afterPosting:this.afterPosting
+                beforeRequest:this.beforeRequest,
+                afterRequest:this.afterRequest
             };
 
             this.options = $.extend({}, defaultOptions, options);
         },
 
         //==========================================================================
-        //  post : Main function of AjaxPoster to be called when we want to POST
-        //          or GET data to/from a server.
+        //  makeRequest : Main function of AjaxRequest to be called when we want to 
+        //                 POST or GET data to/from a server.
         //
         //  @params : post : Post object usually representing values of a form. When
         //                    using AjaxForm, use AjaxForm.getPost() as post. 
@@ -70,7 +71,7 @@
         //  @returns : afterPostDfd : $.Deferred() so that we can use it 
         //                            asynchronously and still know when it is done.
         //==========================================================================
-        post:function(post){
+        makeRequest:function(post){
             var _self = this;
 
             // Deactivate form while posting
@@ -80,17 +81,28 @@
             }
             
             _self.isPosting = true;
-            var beforePostDfd = _self.options.beforePosting();
+            var beforePostDfd = _self.options.beforeRequest();
             var postDfd = $.Deferred();
             var afterPostDfd = $.Deferred();
+            var ajaxOptions = {};
 
+            if(post !== undefined && _self.options.type.toUpperCase() !== 'POST'){
+                console.log('Trying to GET, but parameter post is valid. Did you mean to POST?');
+                return;
+            }
 
-            postDfd = $.ajax({
-                type:_self.options.type,
-                url:_self.options.url,
-                dataType:_self.options.dataType,
-                data:post
-            });
+            ajaxOptions.type = _self.options.type;
+            ajaxOptions.url = _self.options.url;
+
+            // If it is not set, means taht we let $.Ajax's intelligent guess do it
+            if(_self.options.dataType !== undefined)
+                ajaxOptions.dataType = _self.options.dataType;
+
+            // POST Request only
+            if(_self.options.type.toUpperCase() === 'POST')
+               ajaxOptions.data = post;
+
+            postDfd = $.ajax(ajaxOptions);
             
             $.when(postDfd, beforePostDfd).then(
                 function(data){
@@ -103,7 +115,7 @@
                     _self.options.onFailure();
                 }
             ).always(function(){
-                afterPostDfd = _self.options.afterPosting();
+                afterPostDfd = _self.options.afterRequest();
 
                 afterPostDfd.done(function(){
                     _self.reactivateForm();
@@ -114,11 +126,11 @@
         },
 
         //=====================================================================
-        //  deactivateForm : Deactivates posting while we are already posting,
+        //  deactivateForm : Deactivates requesting while we are already doing it,
         //                   thus preventing double posts to database.
         //=====================================================================
         deactivateForm:function(){
-            console.log('Warning : Cannot POST or GET right now because we are already posting. The post function will reactivate after the POST or GET is completed.');
+            console.log('Warning : Cannot POST or GET right now because we are already sending a request to the server. The post function will reactivate after the request is completed.');
         },
 
         //===================================================================
@@ -129,17 +141,17 @@
         },
 
         //=========================================================
-        //  beforePosting : Actions that are done before posting.
+        //  beforeRequest : Actions that are done before making a request.
         //
         //  This function can / should be overwritten, this
         //  function MUST return a $.Deferred()
         //
         //  @returns : dfd : $.Deferred()
         //=========================================================
-        beforePosting:function(){
+        beforeRequest:function(){
             var dfd = $.Deferred();
 
-            //console.log("Do this before posting");
+            console.log("Do this before request");
             setTimeout(function(){
                 dfd.resolve();
             }, 2000);
@@ -148,7 +160,7 @@
         },
 
         //===================================================================
-        //  afterPosting : Actions that are done after posting, regardless
+        //  afterRequest : Actions that are done after the request, regardless
         //                 of the result of the request.
         //
         //  This function can / should be overwritten, this
@@ -156,9 +168,9 @@
         //
         //  @returns : dfd : $.Deferred()
         //===================================================================
-        afterPosting:function(){
+        afterRequest:function(){
             var dfd = $.Deferred();
-            //console.log("Do this after posting");
+            console.log("Do this after request");
             
             dfd.resolve();
             return dfd;
@@ -180,7 +192,7 @@
         //  This function can / should be overwritten.
         //====================================================
         onFailure:function(){
-           // console.log("Do this after failure");
+            console.log("Do this after failure");
         },
 
         //==================================================================
@@ -228,5 +240,5 @@
         }
     };
 
-    return AjaxPoster;
+    return AjaxRequest;
 }));

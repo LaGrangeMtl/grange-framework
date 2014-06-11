@@ -7,35 +7,37 @@
 
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define('lagrange/forms/AjaxForm', ['jquery', 'lagrange/forms/AjaxPoster'], factory);
+        define('lagrange/forms/AjaxForm', ['jquery', 'lagrange/forms/AjaxRequest'], factory);
     } else {
         // Browser globals
-        ns[name] = factory(root.jQuery, ns.AjaxPoster);
+        ns[name] = factory(root.jQuery, ns.AjaxRequest);
     }
-}(this, function ($, AjaxPoster) {
+}(this, function ($, AjaxRequest) {
     //===================================================================================
-    //  AjaxPoster : Constructor function
+    //  AjaxForm : Constructor function
     //
     //  @params : form : jQuery object of the form
     //
-    //  @params : postingOptions : Object containing several settings necessary for 
-    //                              the well behavior of AjaxPoster. These settings are :
-    //                              {
-    //                                  type: 'POST',
-    //                                  url: '',
-    //                                  dataType: 'JSON',
-    //                                  debugOnFailure: true,
-    //                                  onSuccess:this.onSuccess,
-    //                                  onFailure:this.onFailure,
-    //                                  beforePosting:this.beforePosting,
-    //                                  afterPosting:this.afterPosting      
-    //                              }
-    //===================================================================================
+    //  @params : options : Object containing several settings necessary for the
+    //                      well behavior of AjaxRequest. These settings are :
+    //                      {
+    //                          type: 'GET',
+    //                          url: '',
+    //                          dataType: 'JSON', // By default, is not set so that
+    //                                                it uses the intelligent guess
+    //                                                provided by jQuery
+    //                          debugOnFailure: true,
+    //                          onSuccess:this.onSuccess,
+    //                          onFailure:this.onFailure,
+    //                          beforeRequest:this.beforeRequest,
+    //                          afterRequest:this.afterRequest      
+    //                      }
+    //==============================================================================
     var AjaxForm = function(form, postingOptions) {
         this.form = form;
 
         this.fields = [];
-        this.AjaxPoster = new AjaxPoster(postingOptions);
+        this.AjaxRequest = new AjaxRequest(postingOptions);
         this.setupForm();
     };
     
@@ -88,7 +90,7 @@
                 var _post = _self.getPost();
 
                 if (_post && _post != {}) {
-                    _self.AjaxPoster.post(_post);
+                    _self.AjaxRequest.makeRequest(_post);
                 }
             });
         },
