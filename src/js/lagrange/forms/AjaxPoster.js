@@ -139,7 +139,7 @@
         beforePosting:function(){
             var dfd = $.Deferred();
 
-            console.log("Do this before posting");
+            //console.log("Do this before posting");
             setTimeout(function(){
                 dfd.resolve();
             }, 2000);
@@ -158,7 +158,7 @@
         //===================================================================
         afterPosting:function(){
             var dfd = $.Deferred();
-            console.log("Do this after posting");
+            //console.log("Do this after posting");
             
             dfd.resolve();
             return dfd;
@@ -180,7 +180,7 @@
         //  This function can / should be overwritten.
         //====================================================
         onFailure:function(){
-            console.log("Do this after failure");
+           // console.log("Do this after failure");
         },
 
         //==================================================================

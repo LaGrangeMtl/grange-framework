@@ -7,14 +7,10 @@
 			'native.history' : 'vendor/native.history',
 			'imagesloaded/imagesloaded' : 'vendor/imagesloaded',
 			'lagrange' : '../../src/js/lagrange'
-		},
-		shim: {
-		
 		}
 	});
 
-	requirejs(['jquery', 'example/ExampleApp', 'vendor/es5-shim.min', 'vendor/es5-sham.min'], function($, ExampleApp){
-
+	requirejs(['jquery', 'example/ExampleApp'], function($, ExampleApp){
 		$(function(){
 			ns.app = ExampleApp.initialize();
 		});

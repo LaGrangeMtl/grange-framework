@@ -131,14 +131,14 @@
 					window.open('http://www.youtube.com/watch?v='+settings.youtubeId);
 					return;
 				}
-				console.log(this);
+				//console.log(this);
 				togglingElements = $(this);
 				
 				if(settings.hideOnPlay){
 					togglingElements = togglingElements.add($(settings.hideOnPlay));
 				}
 				
-				playVideo($(this).parent(), settings);
+				playVideo((settings.playerId && $('#'+settings.playerId)) || el.parent(), settings);
 			});
 		},
 		

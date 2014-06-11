@@ -6,7 +6,6 @@ define(
 		'example/Navig'
 	], 
 	function(ns, WU, $, Navig) {
-
 		return {			
 			initialize : function(){
 

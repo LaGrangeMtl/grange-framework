@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 			build: {
 				options: {
 					
-					skipDirOptimize: true,
+					skipDirOptimize: false,
 					name: "app",
 					include: [],
 					insertRequire: [],

@@ -9,7 +9,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/master.css">
         <link rel="canonical" href="<?php echo $link ?>">
-        <script data-main="js/app.js" src="js/require.js"></script>
+        <script src="js/vendor/modernizr.js"></script>
+        <script src="js/vendor/es5-shim.js"></script>
+        <script src="js/vendor/es5-sham.js"></script>
+        <script data-main="js/app.js" src="js/require.js?v=0.0.1"></script>
 
     </head>
     <body>
