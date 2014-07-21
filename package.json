@@ -12,14 +12,9 @@
 		"grunt-contrib-requirejs": "~0.4.3",
 		"grunt": "~0.4.4",
 		"rjs-build-analysis": "0.0.3",
-<<<<<<< HEAD
 		"grunt-contrib-less": "~0.10.0",
-	    "grunt-contrib-concat": "latest"
-=======
-		"grunt-contrib-less": "~0.7.0",
 	    "grunt-contrib-concat": "latest",
 	    "grunt-bowercopy":"latest"
->>>>>>> 4a0c8c5ae6cdcef135cf895a3b9a21c0a5da2236
 	},
 	"keywords": []
 }

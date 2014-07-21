@@ -1,16 +1,5 @@
-define(
-	[
-		'example/NameSpace',
-		'lagrange/utils/WindowUtils',
-		'lagrange/utils/MobileDetect',
-		'jquery',
-		'example/menus/Menus',
-		'example/content/PageFactory',
-		'example/content/Preloader',
-		'TweenMax',
-		'native.history'
-	],
-	function(ns, WU, MobileDetect, $, Menus, PageFactory, Preloader, TweenMax){
+
+	function x(ns, WU, MobileDetect, $, Menus, PageFactory, Preloader, TweenMax){
 
 		var containerId = 'navigWrapper';
 		var container;
@@ -163,6 +152,6 @@ define(
 					e.preventDefault();
 				});
 			}
-		}
+		};
 	}
-);
+	
