@@ -35,6 +35,9 @@
     //==============================================================================
     var AjaxForm = function(form, postingOptions) {
         this.form = form;
+        if(postingOptions.capsule !== undefined) {
+            this.capsule = postingOptions.capsule;
+        }
 
         this.fields = [];
         this.AjaxRequest = new AjaxRequest(postingOptions);
@@ -103,6 +106,9 @@
         //===========================================================
         getPost:function() {
             var post = {};
+            var _self = this;
+            if(_self.capsule !== undefined)
+                post[_self.capsule] = {};
 
             this.form.find(':input').not('[type=radio]').each(function() {
                 var inp = $(this);
@@ -117,13 +123,22 @@
                 }
 
                 var n = inp.attr('name');
-                if (n) post[n] = inpVal;
+                if (n) {
+                    if(_self.capsule !== undefined && !inp.hasClass('dontEncapsulate'))
+                        post[_self.capsule][n] = inpVal;
+                    else
+                        post[n] = inpVal;
+                }
             });
 
             this.form.find(':radio').filter(':checked').each(function() {
                 var inp = $(this);
                 var inpVal = inp.val();
-                post[inp.attr('name')] = inpVal;
+                
+                if(_self.capsule !== undefined && !inp.hasClass('dontEncapsulate'))
+                    post[_self.capsule][inp.attr('name')] = inpVal;
+                else
+                    post[inp.attr('name')] = inpVal;
             });
             //console.dir(post);
             return post;
