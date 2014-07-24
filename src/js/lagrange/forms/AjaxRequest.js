@@ -72,6 +72,7 @@
         //                            asynchronously and still know when it is done.
         //==========================================================================
         makeRequest:function(post){
+            this.post = post;
             var _self = this;
 
             // Deactivate form while posting
@@ -81,12 +82,12 @@
             }
             
             _self.isPosting = true;
-            var beforePostDfd = _self.options.beforeRequest();
+            var beforePostDfd = _self.options.beforeRequest(_self);
             var postDfd = $.Deferred();
             var afterPostDfd = $.Deferred();
             var ajaxOptions = {};
 
-            if(post !== undefined && _self.options.type.toUpperCase() !== 'POST'){
+            if(_self.post !== undefined && _self.options.type.toUpperCase() !== 'POST'){
                 console.log('Trying to GET, but parameter post is valid. Did you mean to POST?');
                 return;
             }
@@ -94,14 +95,21 @@
             ajaxOptions.type = _self.options.type;
             ajaxOptions.url = _self.options.url;
 
-            // If it is not set, means taht we let $.Ajax's intelligent guess do it
+            // If it is not set, means that we let $.Ajax's intelligent guess do it
             if(_self.options.dataType !== undefined)
                 ajaxOptions.dataType = _self.options.dataType;
 
-            // POST Request only
-            if(_self.options.type.toUpperCase() === 'POST')
-               ajaxOptions.data = post;
+            // If the request is JSONP
+            if(_self.options.jsonpCallback !== undefined)
+                ajaxOptions.jsonpCallback = _self.options.jsonpCallback;
 
+            // POST Request only
+            if(_self.options.type.toUpperCase() === 'POST' && _self.options.data == undefined)
+               ajaxOptions.data = _self.post;
+            else
+                ajaxOptions.data = _self.options.data;
+
+            // Do the actual request and treat callbacks
             postDfd = $.ajax(ajaxOptions);
             
             $.when(postDfd, beforePostDfd).then(
@@ -150,12 +158,8 @@
         //=========================================================
         beforeRequest:function(){
             var dfd = $.Deferred();
-
-            console.log("Do this before request");
-            setTimeout(function(){
-                dfd.resolve();
-            }, 2000);
-
+            //console.log("Do this before request");
+            dfd.resolve();
             return dfd;
         },
 
@@ -170,8 +174,7 @@
         //===================================================================
         afterRequest:function(){
             var dfd = $.Deferred();
-            console.log("Do this after request");
-            
+            //console.log("Do this after request");
             dfd.resolve();
             return dfd;
         },
@@ -192,7 +195,7 @@
         //  This function can / should be overwritten.
         //====================================================
         onFailure:function(){
-            console.log("Do this after failure");
+            //console.log("Do this after failure");
         },
 
         //==================================================================
