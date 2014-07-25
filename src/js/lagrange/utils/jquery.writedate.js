@@ -37,6 +37,7 @@ version 2014-06-26
 	%Y Four digit representation for the year
 	%b	Abbreviated month name, based on the locale (Jan, Feb...)
 	%B  Full month name, based on the locale
+	%m Month (01 to 12)
 	*/ 
 
 
@@ -54,7 +55,8 @@ version 2014-06-26
 			
 		var _self = $(el);
 		var date = _self.text();
-		var month = Number(date.substr(5,2))-1;
+		var monthStr = date.substr(5,2);
+		var month = Number(monthStr)-1;
 		var year = date.substr(0, 4);
 		var dayStr = date.substr(8, 2);
 		var day = Number(dayStr);/**/
@@ -66,7 +68,8 @@ version 2014-06-26
 			d : dayStr,
 			Y : year,
 			b: monthsShort[lang][month],
-			B: months[lang][month]
+			B: months[lang][month],
+			m: monthStr
 		};
 
 		var textDate = typeof settings.format == 'string' ? settings.format : settings.format[lang] ;
