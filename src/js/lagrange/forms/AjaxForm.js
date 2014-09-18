@@ -5,9 +5,9 @@
         return prev[part] = (prev[part] || {});
     }, root);
 
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define('lagrange/forms/AjaxForm', ['jquery', 'lagrange/forms/AjaxRequest'], factory);
+    if (typeof exports === 'object') {
+        // CommonJS
+        ns[name] = module.exports = factory(require('jquery'), require('lagrange/forms/AjaxRequest.js'));
     } else {
         // Browser globals
         ns[name] = factory(root.jQuery, ns.AjaxRequest);
@@ -175,6 +175,11 @@
                 return true;
             }
         }       
+    };
+
+    AjaxForm.factory = function(instance) {
+        instance = instance || {};
+        return AbstractTransition.call(instance);
     };
 
     return AjaxForm;

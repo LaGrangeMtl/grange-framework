@@ -1,7 +1,7 @@
 {
 	"name": "lagrange",
 	"title": "La Grange",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"homepage": "",
 	"author": {
 		"name": "La Grange",
@@ -9,12 +9,31 @@
 	},
 	"devDependencies": {
 		"grunt-contrib-watch": "~0.4.4",
-		"grunt-contrib-requirejs": "~0.4.3",
+   		"grunt-browserify": "latest",
 		"grunt": "~0.4.4",
-		"rjs-build-analysis": "0.0.3",
 		"grunt-contrib-less": "~0.10.0",
-	    "grunt-contrib-concat": "latest",
-	    "grunt-bowercopy":"latest"
+   		"grunt-contrib-uglify": "latest",
+	    "grunt-bowercopy":"latest",
+	    "browserify-shim" : "~3.4.1"
+	},
+	"dependencies" : {
+	    "history.js" : "~1.8",
+	    "jquery": ">=1.9 <2.0",
+	    "imagesloaded": "~3.1.4",
+	    "gsap": "latest",
+	    "es5-shim": "latest",
+	    "lodash":"latest"
+	},
+	"browserify": {
+		"transform": [
+		  "browserify-shim"
+		]
+	},
+	"browser": {
+	    "historyjs": "./bower_components/history.js/scripts/bundled/html4+html5/native.history.js"
+  	},
+	"browserify-shim": {
+		"historyjs" : "History"
 	},
 	"keywords": []
 }

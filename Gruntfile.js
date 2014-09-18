@@ -2,6 +2,8 @@
 
 module.exports = function(grunt) {
 
+	var _ = require('lodash');
+
 	// Project configuration.
 	grunt.initConfig({
 		// Metadata.
@@ -12,79 +14,83 @@ module.exports = function(grunt) {
 			'* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;'+
 			'*/\n\n',
 		// Task configuration.
-
-		concat: {
-			options: {
-				banner: '<%= banner %>',
-				stripBanners: true
-			},
-	    },
-
-		requirejs: {
-			build: {
-				options: {
-					
-					skipDirOptimize: false,
-					name: "app",
-					include: [],
-					insertRequire: [],
-					out: "example/built/app.js",
-					baseUrl: 'example/js/',
-					mainConfigFile: 'example/js/app.js',
-					done: function(done, output) {
-						var duplicates = require('rjs-build-analysis').duplicates(output);
-
-						if (duplicates.length > 0) {
-							grunt.log.subhead('Duplicates found in requirejs build:');
-							grunt.log.warn(duplicates);
-							done(new Error('r.js built duplicate modules, please check the excludes option.'));
-						}
-
-						done();
-					}
-				}
-			},
-			prebuild: {
-				options: {
-					optimize: "none",
-					skipDirOptimize: true,
-					name: "imagesloaded/imagesloaded",
-					include: [],
-					insertRequire: [],
-					out: "example/js/vendor/imagesloaded.js",
-					baseUrl: 'bower_components/',
-					paths: {}
-				}
-			}
-		},
 		bowercopy: {
 			options: {
 				srcPrefix: 'bower_components',
 			},
 			vendor: {
 				options: {
-					destPrefix: 'example/js/vendor',
+					destPrefix: 'example/app/vendor',
 				},
 				 files: {
-					'jquery.js' : 'jquery/dist/jquery.min.js',
-					'es5-shim.min.js' : 'es5-shim/es5-shim.min.js',
-					'es5-sham.min.js' : 'es5-shim/es5-sham.min.js',
-					'modernizr.js' : 'modernizr/modernizr.js',
-					'underscore.js' : 'underscore/underscore.js',
-					'greensock' : 'gsap/src/minified',
-					'native.history.js' : 'history.js/scripts/bundled/html4+html5/native.history.js',
+					
 				}
+			}
+		},
+
+		browserify : {
+			options : {
+				external: ['es5-shim', 'gsap', 'jquery', 'historyjs', 'lodash', 'imagesloaded'],
+				browserifyOptions : {
+					debug: false
+				},
+				//
+			},
+			dev : {
+				files: {
+				  'example/js/app.js': ['example/app/example/ExampleApp.js'],
+				},
+				options : {
+					browserifyOptions : {
+						debug: true
+					},
+				}
+			},
+			prod : {
+				files: {
+				  'example/js/app.js': ['example/app/example/ExampleApp.js'],
+				},
+			},
+			common: {
+				src: ['.'],
+				dest: 'example/js/common.js',
+				options: {
+					debug: false,
+					transforms: ["browserify-shim"],
+					alias : [
+						'es5-shim:',
+						'jquery:',
+						'gsap:',
+						'imagesloaded:',
+						'lodash:',
+						'historyjs:',
+					],
+					external : null,
+				},
 			}
 		},
 
 		watch: {
 			js: {
 				files: 'example/js/**/*.js',
-				tasks: ['requirejs:build']
+				tasks: ['browserify:prod']
 			},
 			less: {
 				files: 'example/less/*.less',
 				tasks: ['less']
+			}
+		},
+		uglify: {
+			options: {
+				banner:  '<%= banner %>'
+			},
+			prod: {
+				src: 'example/js/app.js',
+				dest: 'example/js/app.js'
+			},
+			common: {
+				src: 'example/js/common.js',
+				dest: 'example/js/common.js'
 			}
 		},
 		less: {
@@ -106,14 +112,16 @@ module.exports = function(grunt) {
 	});
 
 	// These plugins provide necessary tasks.
-	grunt.loadNpmTasks('grunt-contrib-requirejs');
+	grunt.loadNpmTasks('grunt-browserify');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-bowercopy');
 
 	// Default task.
-	grunt.registerTask('default', ['requirejs:build']);
+	grunt.registerTask('default', ['browserify:dev']);
+	grunt.registerTask('prod', ['browserify:prod', 'uglify:prod']);
+	grunt.registerTask('jslibs', ['browserify:common', 'uglify:common']);
 	grunt.registerTask('prebuild', ['requirejs:prebuild', 'bowercopy']);
 
 };

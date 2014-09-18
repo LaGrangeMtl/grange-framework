@@ -3,37 +3,17 @@
  * @author Martin Vézina <m.vezina@la-grange.ca>
  * @copyright 2014 Martin Vézina <m.vezina@la-grange.ca>
  * 
- * module pattern : https://github.com/umdjs/umd/blob/master/amdWebGlobal.js
 */
-(function (root, factory) {
-	var nsParts = 'example/ExampleTransition'.split('/');
-	var name = nsParts.pop();
-	var ns = nsParts.reduce(function(prev, part){
-		return prev[part] = (prev[part] || {});
-	}, root);
-
-	if (typeof define === 'function' && define.amd) {
-		define(
-			'example/ExampleTransition',//must be a string, not a var
-			[
-				'jquery',
-				'lagrange/animation/AbstractTransition'
-			], function ($, AbstractTransition) {
-			return (ns[name] = factory($, AbstractTransition));
-		});
-	} else {
-		ns[name] = factory(root.$, root.lagrange.animation.AbstractTransition);
-	}
-}(this, function ($, AbstractTransition) {
 	"use strict";
 
-	var tests = {};
+	var $ = require('jquery'); 
+	var AbstractTransition = require('lagrange/animation/AbstractTransition.js');
 
-	var ExampleTransition = function(name){
+	var A = function(name){
 	};
 
-	ExampleTransition.prototype = {
-		constructor: ExampleTransition,
+	A.prototype = {
+		constructor: A,
 		setAnimation : function(tl, context, setInEndTime) {
 			var A = $('.spriteA', context);
 			var B = $('.spriteB', context);
@@ -51,13 +31,20 @@
 			console.log(what, this);
 		}
 	};
+	A.factory = function(){
+		return new A();
+	};
 
-	tests.A = new ExampleTransition('pet');
-	tests.A = AbstractTransition.factory(tests.A);
+	AbstractTransition.factory(A.prototype);
 
-	var slide = new AbstractTransition();
 
-	tests.B.setAnimation = function(tl, context, setInEndTime) {
+
+	var B = new AbstractTransition();
+	B.factory = function(o){
+		return $.extend((o || {}), B);
+	};
+
+	B.setAnimation = function(tl, context, setInEndTime) {
 		var A = $('.spriteA', context);
 		var B = $('.spriteB', context);
 		tl.append( TweenLite.from(A, 0.4, {opacity:0, left:"-=100px", ease:Expo.easeOut}) );
@@ -67,26 +54,32 @@
 		tl.append( TweenLite.to(B, 0.4, {opacity:0, left:"+=100px", ease:Expo.easeIn}) );
 		return tl;
 	};
-	tests.B.wakeup = function(what) {
+	B.wakeup = function(what) {
 		console.log(what, this);
 	};
-	tests.B.deactivate = function(what) {
+	B.deactivate = function(what) {
 		console.log(what, this);
 	};
 
 
-	return {
+	module.exports = {
 		init : function(){
+
+			var tests = {
+				A : new A(),
+				B : B.factory()
+			};
+
 			tests.A.setupTransition('#rootA');
 			tests.B.setupTransition('#rootB');
 
 			//console.dir(AbstractTransition);
 			console.log('A',tests.A);
 			console.log('B',tests.B);
-			console.log('A is AbstractTransition', tests.A instanceof AbstractTransition);
-			console.log('A is ExampleTransition', tests.A instanceof ExampleTransition);
-			console.log('B is AbstractTransition', tests.B instanceof AbstractTransition);
-			console.log('B is ExampleTransition', tests.B instanceof ExampleTransition);
+			console.log('A is AbstractTransition %s', tests.A instanceof AbstractTransition);
+			console.log('A is A %s', tests.A instanceof A);
+			console.log('B is AbstractTransition %s', tests.B instanceof AbstractTransition);
+			console.log('B is A %s', tests.B instanceof A);
 
 			var btns = $('.check');
 			
@@ -102,7 +95,5 @@
 			});
 		}
 	};
-
-}));
 
 

@@ -9,10 +9,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="css/master.css">
         <link rel="canonical" href="<?php echo $link ?>">
-        <script src="js/vendor/modernizr.js"></script>
-        <script src="js/vendor/es5-shim.js"></script>
-        <script src="js/vendor/es5-sham.js"></script>
-        <script data-main="js/app.js" src="js/require.js?v=0.0.1"></script>
+
+        <script src="js/common.js"></script>
+        <script src="js/app.js"></script>
 
     </head>
     <body>
@@ -29,6 +28,15 @@
                 <img src="<?php echo $currentPage['image'] ?>">
             </div>
         </article>
+
+        <div id="rootA">
+            <div class="spriteA">a</div>
+            <div class="spriteB">b</div>
+        </div>
+        <div id="rootB">
+            <div class="spriteA">a</div>
+            <div class="spriteB">b</div>
+        </div>
       
     </body>
 </html>

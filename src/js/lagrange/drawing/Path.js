@@ -11,17 +11,13 @@
 	var ns = nsParts.reduce(function(prev, part){
 		return prev[part] = (prev[part] || {});
 	}, root);
-	if (typeof define === 'function' && define.amd) {
-		define(
-			'lagrange/drawing/Path',//must be a string, not a var
-			[
-			], function () {
-			return (ns[name] = factory());
-		});
-	} else {
-		ns[name] = factory();
+	if (typeof exports === 'object') {
+	    // CommonJS
+	    ns[name] = module.exports = factory(require('raphael'));
+  	} else {
+		ns[name] = factory(root.Raphael);
 	}
-}(this, function () {
+}(this, function (Raphael) {
 	"use strict";
 
 	var reg = /([a-z])([0-9\s\,\.\-]+)/gi;
@@ -39,7 +35,7 @@
 	var Path = function(svg, name, parsed) {
 		this.svg = svg;
 		this.name = name;
-		//console.log(svg, parsed);
+		//if(svg) console.log(svg, parsed);
 		this.setParsed(parsed || this.parse(svg));
 	};
 
@@ -61,6 +57,7 @@
 	};
 
 	Path.prototype.setParsed = function(parsed) {
+		//console.log(parsed);
 		this.parsed = parsed;
 		this.findBounding();
 	};
@@ -69,63 +66,24 @@
 		return this.cubic || this.parseCubic();
 	};
 
-	// cubic helper formula at t interval
-	var CubicN = function(t, a, b, c, d) {
-		var t2 = t * t;
-		var t3 = t2 * t;
-		return a + (-a * 3 + t * (3 * a - a * t)) * t
-		+ (3 * b + t * (-6 * b + b * 3 * t)) * t
-		+ (c * 3 - c * 3 * t) * t2
-		+ d * t3;
-	};
+
 	Path.prototype.getLength = function() {
 		
-		
-		var lastPoint = [0, 0];
+		return Raphael.getTotalLength(this.getSVGString())
 
-		var length = this.parsed.reduce(function(l, segment){
-			var type = segment.type;
-			var fcn = false;
-
-			//clone
-			var anchors = segment.anchors.slice(0);
-			//console.log(segment.anchors);
-			switch(type) {
-				case 'M':
-					break;
-				case 'S':
-				case 'C':
-					
-					for(var i=0; i<50; i++) {
-						var x = CubicN(i/50, lastPoint[0], segment.anchors[0], segment.anchors[2], segment.anchors[4]);
-						var y = CubicN(i/50, lastPoint[1], segment.anchors[1], segment.anchors[3], segment.anchors[5]);
-						//console.log(x, y);
-						l += Math.sqrt(Math.pow(y - lastPoint[1], 2) + Math.pow(x - lastPoint[0], 2));
-					}
-
-					break;
-				case 'L':
-					l += Math.sqrt(Math.pow(anchors[1] - lastY, 2) + Math.pow(anchors[0] - lastX, 2));
-					break;
-			}
-
-			var lastY = anchors.pop();
-			var lastX = anchors.pop();
-
-			lastPoint = [lastX, lastY];
-			return l;
-		}, 0);
-
-		//console.log(this.name, length);
-
-		return length;
-		
-
-		
 	};
 
 	/**
-	Parses an SVG path string to a list of segment definitions, notably to be used by easel
+	Gets an SVG string of the path segemnts. It is not the svg property of the path, as it is potentially transformed
+	*/
+	Path.prototype.getSVGString = function() {
+		return this.parsed.reduce(function(svg, segment){
+			return svg + segment.type + segment.anchors.join(','); 
+		}, '');
+	};
+
+	/**
+	Parses an SVG path string to a list of segment definitions with ABSOLUTE positions (therefore we don't use Raphael.parsePathString)
 	*/
 	Path.prototype.parse = function(svg) {
 		var m;
@@ -154,7 +112,7 @@
 
 		var path = rawDefs.map(function(def) {
 
-			//console.log(m);
+			//console.log(def);
 			var type = def.type;
 			var createJsCommand;
 			var isAbsolute = type === type.toUpperCase();
@@ -171,6 +129,9 @@
 				//moveTo
 				case 'm':
 					createJsCommand = 'moveTo';
+					break;
+				case 'l':
+					createJsCommand = 'lineTo';
 					break;
 				//horizontal line to
 				case 'h':
@@ -210,7 +171,7 @@
 			};
 
 		});
-
+	
 		return path;
 	};
 
@@ -225,8 +186,7 @@
 	Path.prototype.parseCubic = function() {
 		//console.log(path);
 		//assumed first element is a moveto
-		var anchors = this.cubic = [];
-		this.parsed.forEach(function(segment){
+		var anchors = this.cubic = this.parsed.reduce(function(anchors, segment){
 			var a = segment.anchors;
 			if(segment.type==='M'){
 				anchors.push({x: a[0], y:a[1]});
@@ -239,8 +199,9 @@
 				anchors.push({x: a[2], y: a[3]});
 				anchors.push({x: a[4], y: a[5]});
 			}
+			return anchors;
 
-		});
+		}, []);
 
 		return anchors;
 
@@ -248,8 +209,7 @@
 
 	//trouve le bounding box d'une lettre (en se fiant juste sur les points... on ne calcule pas ou passe le path)
 	Path.prototype.findBounding = function() {
-		var bounding = this.bounding = [];
-		this.parsed.forEach(function(p){
+		var bounding = this.bounding = this.parsed.reduce(function(bounding, p){
 			var anchors = p.anchors;
 			var point;
 			if(anchors.length === 2) {
@@ -257,8 +217,8 @@
 			} else if(anchors.length === 6) {
 				point = [anchors[4], anchors[5]];
 			}
-			bounding = refineBounding(bounding, point);
-		});
+			return refineBounding(bounding, point);
+		}, []);
 		return bounding;
 	};
 

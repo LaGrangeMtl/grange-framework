@@ -20,3 +20,13 @@ Actual base folder of the framework. Consider this as the root of your project, 
 
 * _/js/lagrange :
 	JavaScript Classes and Dependencies going in their relative folders (structure to come).
+
+
+Pour faire fonctionner l'exemple
+--------------------------------
+
+Il faut configurer pour que les paths de l'app resolvent dans node_modules 
+
+ln -s ../example/app node_modules/app
+ln -s ../src/js/lagrange node_modules/lagrange
+ln -s ../example/app/example node_modules/example
