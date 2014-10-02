@@ -7,7 +7,7 @@
 
     if (typeof exports === 'object') {
         // CommonJS
-        ns[name] = module.exports = factory(require('jquery'), require('lagrange/forms/AjaxRequest.js'));
+        ns[name] = module.exports = factory(require('jquery'), require('./AjaxRequest.js'));
     } else {
         // Browser globals
         ns[name] = factory(root.jQuery, ns.AjaxRequest);
@@ -35,7 +35,7 @@
     //==============================================================================
     var AjaxForm = function(form, postingOptions) {
         this.form = form;
-        if(postingOptions.capsule !== undefined) {
+        if(postingOptions && postingOptions.capsule !== undefined) {
             this.capsule = postingOptions.capsule;
         }
 
@@ -174,7 +174,23 @@
             } else {
                 return true;
             }
-        }       
+        },
+
+        
+        /**
+        
+        getAjaxParams : gets an object to post to jQuery.ajax correspondig to the current form, including method and url
+
+        @params : default : object with default values
+
+        */
+        getAjaxParams : function(defaults){
+            return $.extend({}, defaults, {
+                url : defaults.url || this.form.attr('action') || '.',
+                type : String(defaults.type || this.form.attr('method') || 'get').toLowerCase(),
+                data : this.getPost()
+            });
+        }
     };
 
     AjaxForm.factory = function(instance) {

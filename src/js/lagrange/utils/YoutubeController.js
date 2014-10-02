@@ -13,7 +13,7 @@
 
 	if (typeof exports === 'object') {
 	    // CommonJS
-	    ns[name] = module.exports = factory(require('jquery'), require('lagrange/utils/YoutubePlayer.js'), require('lagrange/utils/MobileDetect.js'), require('vendor/jquery.scrollto.js'));
+	    ns[name] = module.exports = factory(require('jquery'), require('./YoutubePlayer.js'), require('./MobileDetect.js'), require('vendor/jquery.scrollto.js'));
   	} else {
 		ns[name] = factory(root.jQuery, root.lagrange.utils.YoutubePlayer, root.lagrange.utils.MobileDetect);
 	}

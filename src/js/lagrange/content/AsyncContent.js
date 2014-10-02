@@ -13,7 +13,7 @@
 	}, root);
 	if (typeof exports === 'object') {
 	    // CommonJS
-	    ns[name] = module.exports = factory(require('jquery'), require('lagrange/animation/AbstractTransition.js'), require('imagesloaded'));
+	    ns[name] = module.exports = factory(require('jquery'), require('../animation/AbstractTransition.js'), require('imagesloaded'));
   	} else {
 		ns[name] = factory(root.$, root.lagrange.animation.AbstractTransition, imagesloaded);
 	}

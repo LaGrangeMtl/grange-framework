@@ -16,7 +16,7 @@
 
 	if (typeof exports === 'object') {
 	    // CommonJS
-	    ns[name] = module.exports = factory(require('jquery'), require('lagrange/content/Async.js'));
+	    ns[name] = module.exports = factory(require('jquery'), require('./Async.js'));
   	} else {
 		ns[name] = factory(root.$, root.lagrange.content.Async);
 	}

@@ -12,7 +12,7 @@
 	
 	if (typeof exports === 'object') {
 	    // CommonJS
-	    ns[name] = module.exports = factory(require('jquery'), require('lagrange/utils/WindowUtils.js'));
+	    ns[name] = module.exports = factory(require('jquery'), require('../utils/WindowUtils.js'));
   	} else {
 		ns[name] = factory(root.jQuery, root.lagrange.utils.WindowUtils);
 	}
