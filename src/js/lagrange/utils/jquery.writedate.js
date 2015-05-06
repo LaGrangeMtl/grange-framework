@@ -1,12 +1,13 @@
 
 /*
-version 2014-06-26
+version 2015-05-06
 */
+
 (function (factory) {
-    if (typeof exports === 'object') {
-	    // CommonJS
-	    factory(require('jquery'));
-  	} else {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else {
         // Browser globals
         factory(jQuery);
     }
@@ -18,15 +19,18 @@ version 2014-06-26
 
 	var months = {
 		fr:['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
-		en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+		en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+		es: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
 	};
 	var monthsShort = {
 		fr:['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jul', 'aoû', 'sep', 'oct', 'nov', 'déc'],
-		en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+		en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+		es: ['enero', 'feb', 'marzo', 'abr', 'mayo', 'jun', 'jul', 'agosto', 'sept', 'oct', 'nov', 'dec']
 	};
 	var days = {
 		fr:['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
-		en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+		en: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+		es: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
 	};
 	
 	/*
@@ -44,33 +48,43 @@ version 2014-06-26
 	var defaults = {
 		format : {
 			fr : '%A %e %B %Y',
-			en : '%A %B %e, %Y'
+			en : '%A %B %e, %Y',
+			es : '%A %e %B %Y'
 		},
 		lang : 'fr'
 	};
+
+	var parseStr = function(lang){
+		var parsers = {};
+		if(parsers[lang]) return parsers[lang];
+		parsers[lang] = function(str){
+			var monthStr = str.substr(5,2);
+			var month = Number(monthStr)-1;
+			var year = str.substr(0, 4);
+			var dayStr = str.substr(8, 2);
+			var day = Number(dayStr);/**/
+			if(isNaN(day) || isNaN(month) || isNaN(year)) return;
+			var dObj = new Date(year, month, day);
+			return {
+				A : days[lang][dObj.getDay()],
+				e : day,
+				d : dayStr,
+				Y : year,
+				b: monthsShort[lang][month],
+				B: months[lang][month],
+				m: monthStr
+			};
+		};
+		return parsers[lang];
+	};
+
 	var plugin = function(el, settings) {
 
 		settings = $.extend({}, defaults, settings);
 		var lang = settings.lang;
 			
 		var _self = $(el);
-		var date = _self.text();
-		var monthStr = date.substr(5,2);
-		var month = Number(monthStr)-1;
-		var year = date.substr(0, 4);
-		var dayStr = date.substr(8, 2);
-		var day = Number(dayStr);/**/
-		if(isNaN(day) || isNaN(month) || isNaN(year)) return;
-		var dObj = new Date(year, month, day);
-		var desc = {
-			A : days[lang][dObj.getDay()],
-			e : day,
-			d : dayStr,
-			Y : year,
-			b: monthsShort[lang][month],
-			B: months[lang][month],
-			m: monthStr
-		};
+		var desc = parseStr(lang)(_self.text());
 
 		var textDate = typeof settings.format == 'string' ? settings.format : settings.format[lang] ;
 		$.each(desc, function(key, val){
@@ -85,7 +99,7 @@ version 2014-06-26
 	
 	};
 
-	$.fn[pluginName] = function(options) {
+	var writeDate = function(options) {
 		var input = arguments;
 		if ( this.length ) {
 			return this.each(function () {
@@ -94,6 +108,10 @@ version 2014-06-26
 				
 			});
 		}
-	}
+	};
+
+	writeDate.parseStr = parseStr;
+
+	$.fn[pluginName] = writeDate;
 	
 }));
